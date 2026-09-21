@@ -1,6 +1,17 @@
-# Algoteer Noesis — Alpha 2
+# Algoteer Noesis — Alpha 3.2
 
 A futures trading journal and analytics workstation. This is an **alpha release** for a small group of testers. It is not a finished product, and your feedback is the reason it exists.
+
+---
+
+## What's new since Alpha 2
+
+- **Trade classification.** Record how each trade was *taken* — separately from whether it made money — so a trade that broke your rules and won anyway is visible instead of forgotten.
+- **A pre-trade plan.** Three optional numbers — planned stop, target and size — recorded before the position closes. This is what lets Noesis measure results in R.
+- **Schwab connection (optional, read-only).** Noesis can fetch your executions directly from a Schwab account, alongside the CSV statements it already reads. It cannot place orders — there is no code in Noesis that can. See *Connecting to Schwab* below; most testers can ignore this entirely.
+- **Separate Live and Paper statement folders**, so a paper export can no longer overwrite a live one before Noesis has read it.
+- **A daily backup of your journal**, seven days kept.
+- **Copy Diagnostics**, in Settings. If something goes wrong, this copies a report you can paste into an email. It contains no account numbers, passwords or tokens.
 
 ---
 
@@ -63,7 +74,7 @@ Download **`Algoteer_Noesis.dmg`**.
 
 ## Activating your license
 
-On first launch, Noesis shows a small dialog headed **ALGOTEER NOESIS — ALPHA PREVIEW**, with a field labelled **LICENSE KEY OR TOKEN**.
+On first launch, Noesis shows a small dialog headed **ALGOTEER NOESIS — ALPHA PREVIEW**, with a field labeled **LICENSE KEY OR TOKEN**.
 
 Paste your token into that field and click **Activate Workstation**.
 
@@ -78,14 +89,22 @@ You only do this once. The token is saved and read automatically on every later 
 **Your documents** (both platforms), under your **Documents** folder:
 
 ```
-Documents/Algoteer Noesis/Account Statements/    ← put your broker CSV exports here
-Documents/Algoteer Noesis/Reports/               ← exported reports land here
+Documents/Algoteer/Noesis/Account Statements/Live/    ← live-account CSV exports
+Documents/Algoteer/Noesis/Account Statements/Paper/   ← paper-trading CSV exports
+Documents/Algoteer/Noesis/Reports/                    ← exported reports land here
 ```
+
+Files placed directly in `Account Statements/` are still read. Whichever folder a statement is in, Noesis reads the account type from the file itself.
 
 **Its database:**
 
 - Windows — `%LOCALAPPDATA%\Algoteer\Noesis\data\noesis.db`
 - macOS — `~/Library/Application Support/Algoteer/Noesis/data/noesis.db`
+
+**Its log**, which Settings → Diagnostics → Open Log Folder opens for you:
+
+- Windows — `%LOCALAPPDATA%\Algoteer\Noesis\data\logs\`
+- macOS — `~/Library/Application Support/Algoteer/Noesis/data/logs/`
 
 **Your license token:**
 
@@ -96,7 +115,17 @@ Documents/Algoteer Noesis/Reports/               ← exported reports land here
 
 ## What Noesis sends over the network
 
-On startup, Noesis sends a short message to Algoteer's server recording your licensed name, the app version, and your operating system and processor type. Nothing else leaves your machine — your trades, statements, and account data stay entirely local and are never transmitted.
+On startup, Noesis sends a short message to Algoteer's server recording your license identifier (a random code, not your name), the app's build identifier, and your operating system and processor type. Nothing else is sent to Algoteer — your trades, statements, and account data stay entirely local and are never transmitted to us.
+
+If you connect a Schwab account, Noesis also talks **directly to Schwab**, using credentials stored in your operating system's keychain (macOS Keychain, Windows Credential Manager). That traffic goes between your machine and Schwab only; none of it passes through Algoteer.
+
+---
+
+## Connecting to Schwab (optional)
+
+Most testers should skip this. Noesis works exactly as before from CSV statements, and those remain the authoritative source in this release.
+
+Connecting requires your **own** registered application at `developer.schwab.com`, which gives you a client ID and secret to enter in **Settings → Schwab Connection**. Schwab approves these individually and it can take several days. Without one, the Schwab buttons have nothing to connect with — that is expected, not a fault.
 
 ---
 
@@ -124,4 +153,5 @@ This is what the alpha is for, so please do. The more of this you can include, t
 
 - **Installers are not code-signed.** Hence the warnings above. Signing is in progress and these will disappear in a future build.
 - **macOS is Apple Silicon only.** No Intel build.
-- **Data comes from broker CSV exports.** Direct broker API syncing is being built, but is not in this release.
+- **Schwab syncing needs your own Schwab developer registration.** See above. CSV statements remain the primary source.
+- **No price charts yet.** Charts of the market with your entries and exits drawn on them are the next release.

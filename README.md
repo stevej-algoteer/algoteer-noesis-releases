@@ -1,17 +1,30 @@
-# Algoteer Noesis — Alpha 3.2
+# Algoteer Noesis — Alpha 3
 
 A futures trading journal and analytics workstation. This is an **alpha release** for a small group of testers. It is not a finished product, and your feedback is the reason it exists.
 
 ---
 
-## What's new since Alpha 2
+## What's new since Alpha 3.2
 
-- **Trade classification.** Record how each trade was *taken* — separately from whether it made money — so a trade that broke your rules and won anyway is visible instead of forgotten.
-- **A pre-trade plan.** Three optional numbers — planned stop, target and size — recorded before the position closes. This is what lets Noesis measure results in R.
-- **Schwab connection (optional, read-only).** Noesis can fetch your executions directly from a Schwab account, alongside the CSV statements it already reads. It cannot place orders — there is no code in Noesis that can. See *Connecting to Schwab* below; most testers can ignore this entirely.
-- **Separate Live and Paper statement folders**, so a paper export can no longer overwrite a live one before Noesis has read it.
-- **A daily backup of your journal**, seven days kept.
-- **Copy Diagnostics**, in Settings. If something goes wrong, this copies a report you can paste into an email. It contains no account numbers, passwords or tokens.
+- **Price charts of your own sessions.** A new **Price Chart** tab draws the market for a session in one-minute detail, on a real time axis — a stretch with no trading is drawn as a gap, never squeezed out — with the session's opening and closing times marked, and holidays and early closes named.
+- **Move around a session.** Drag, or scroll sideways, to pan; scroll up or down, or pinch on a Mac trackpad, to zoom where the pointer is. The price scale fits what is on screen (or freeze it to compare levels). A crosshair reads out each candle's open, high, low, close and volume. Choose 1, 2, 5, 15, 30 or 60-minute candles; a candle built from fewer minutes than its timeframe (a quiet stretch with missing minutes) is drawn faded and says so. **Previous trade / Selected trade / Next trade** jump between your trades, and clicking a fill selects its trade in the Journal too. **All stored sessions** lists every session with price history, traded or not; a session you traded that has no price history is listed and named rather than silently left out.
+- **Your entries and exits on the chart.** Every fill is drawn where it happened, and each trade is joined from entry to exit, with its average entry and exit prices as lines. Select a trade in the Journal and it is drawn brighter. Noesis checks every fill against the market's range for that minute and says so if any fill falls outside it.
+- **Reference levels.** The prior session's high, low and close, this session's high and low, and your own price marks — click the price axis, or type a price. A mark belongs to the product (every `/RTY` session, across contract rolls) and stays until you remove it.
+- **Market recording (Schwab connection only).** While Noesis is running and connected, it records the index futures market (`/ES`, `/MES`, `/NQ`, `/RTY`, `/YM`) and keeps it on your machine. The Price Chart draws a session from this recording when the price-history fetch has none, and says which source it used. Each completed day of the recording is also copied to your backup folder.
+- **Recording carries on with the window closed.** While the market recording is running, closing the window hides it instead of quitting, and recording continues. A small ring in the menu bar (on Windows, an icon by the clock) shows what the recorder is doing. Its menu has **Open Noesis** and **Quit Noesis (stops recording)**. On a Mac, clicking the Noesis icon in the Dock also brings the window back, and **⌘Q** quits. The first time you close the window, Noesis says once that it is still recording. Turn this off in **Settings → Keep Recording When the Window Is Closed**, and closing the window quits as before. Without a Schwab connection there is nothing to record, so closing the window quits.
+- **Open Noesis when you log in (optional).** **Settings → Open Noesis When I Log In** starts Noesis, and with it the recorder, when you log in. It is **off** unless you turn it on. On a Mac, if macOS asks you to approve it, the setting says where: System Settings → General → Login Items.
+- **Times in your own time zone.** Every time Noesis shows is in your computer's time zone, wherever you are, labelled ET, CT, MT or PT in the US. To use a fixed zone instead, choose it in **Settings → Time Zone**. Your journal itself still stores the times as Thinkorswim prints them (Eastern), so nothing about your trades changes when you travel.
+- **Globex or regular hours — one meaning everywhere.** The **Globex (All) / RTH Only** switch now counts the same trades in every view: the Dashboard, the Calendar, the Journal, the Price Chart and the exported reports. Regular trading hours are **09:30–16:15 ET**, judged by when a trade was entered. Every view says which it is showing — a line beside the switch, a badge on the Calendar, an *Hours:* line in the copied Summary, and a heading on HTML and PDF reports — and Noesis remembers your choice for the next launch.
+- **Trades sync as soon as Schwab reports them (Schwab connection only).** While the market recording is running, Noesis listens for Schwab's account activity, and each order or fill event starts the same sync as the Sync button — no need to sync by hand. When a sync adds something, the bottom of the window says so; if one fails, it says that too. Turn it off with `"sync_on_activity": false` in `config.json`.
+- **The Calendar names the month of a spill-over day.** A week that straddles two months is drawn once, under the month that owns most of it. Its days from the other month now read *Sep 28*, *Nov 1* and so on, and their figures are dimmed, so they never look like part of the month they sit under.
+- **Layout fixes.** On macOS 27 the title bar was see-through, showing whatever was behind the window; it is now solid. The toolbar row is centred in its bar, and the Calendar's header box grows to fit its contents instead of spilling the *GLOBEX · ALL HOURS* line below it.
+- **Dashboard "By Time" for a single session** now draws one step per trade, at the moment it closed, on the session's own clock (18:00 ET the evening before to 17:00 ET, shown in your time zone).
+- **Share from the Journal.** A **Share** button copies the trades the Journal is showing -- the date range and hours you chose -- to the clipboard as JSON, with a sound unless sound is turned off in Settings.
+- **Failures are reported, not hidden.** If a Schwab sync, a campaign rebuild or the market recording cannot save what it received, Noesis says so instead of reporting success.
+- **Looks like your platform.** Mac scroll bars and system font on macOS; Windows 11 scroll bars on Windows. Figures in the Calendar are never cut off in a narrow window.
+- **The window tells you when it is waiting.** If reading the saved Schwab credentials takes more than a moment — on a Mac, usually because macOS is asking your permission — Noesis says it is waiting rather than appearing to hang.
+
+Alpha 3.2 brought trade classification, the pre-trade plan, the optional Schwab connection, separate Live and Paper folders, the daily journal backup, and Copy Diagnostics. All of those are still here.
 
 ---
 
@@ -127,6 +140,8 @@ Most testers should skip this. Noesis works exactly as before from CSV statement
 
 Connecting requires your **own** registered application at `developer.schwab.com`, which gives you a client ID and secret to enter in **Settings → Schwab Connection**. Schwab approves these individually and it can take several days. Without one, the Schwab buttons have nothing to connect with — that is expected, not a fault.
 
+**Price charts come only from Schwab.** Without a connection, the Price Chart tab says *"No price history is stored yet"* — that is expected, not a fault. The rest of Noesis is unaffected.
+
 ---
 
 ## Uninstalling
@@ -154,4 +169,9 @@ This is what the alpha is for, so please do. The more of this you can include, t
 - **Installers are not code-signed.** Hence the warnings above. Signing is in progress and these will disappear in a future build.
 - **macOS is Apple Silicon only.** No Intel build.
 - **Schwab syncing needs your own Schwab developer registration.** See above. CSV statements remain the primary source.
-- **No price charts yet.** Charts of the market with your entries and exits drawn on them are the next release.
+- **Price charts need a Schwab connection** (see above).
+- **Connect one computer to Schwab at a time.** Connecting a second computer to the same Schwab login ends the first one's connection: it stops syncing and recording until you connect it again in **Settings → Schwab Connection**. Schwab also asks you to connect again at least every seven days.
+- **Charts can only be fetched for recent sessions.** Schwab serves one-minute history for roughly the last six to eight weeks, and **nothing at all for a futures contract once it has expired**. Each time it starts, Noesis fetches the recent sessions you traded and keeps them, so opening it on your trading days is what keeps your charts complete. An older session, or one on a contract that has since rolled, may never have a chart.
+- **The holiday and early-close calendar covers equity-index futures in 2026.** Outside that, gaps are drawn but not explained.
+- **A very full menu bar can hide the recording ring.** macOS drops menu-bar icons that do not fit, and menu-bar managers such as Ice or Bartender may park new icons out of sight. On a Mac, the Dock icon always brings the window back. On Windows, the icon may sit in the notification area's overflow (the **^** by the clock).
+- **Planned stop and target are not drawn on the chart yet**, and nor are excursion measures (how far a trade went against you and for you). Both are planned.
